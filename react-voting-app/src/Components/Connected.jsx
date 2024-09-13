@@ -8,10 +8,15 @@ const Connected = (props) => {
             <p className="connected-account">Metamask Account: {props.account}</p>
             <p className="connected-account">Remaining Time: {props.remainingTime}</p>
 
-            <div>
-                <input type="candidateNo" placeholder="Enter Candidate No" value ={props.candidateNo} onClick={props.handleCandidateNoChange} ></input>
-                <button className="login-button" onClick={props.voteFunction}>Vote</button>
-            </div>
+            {props.showButton ? ( // show button if the user can vote
+                <p className="connected-header">You have already voted</p>
+            ) : (
+                <div>
+                    <input type="number" placeholder="Enter Candidate Index" value ={props.candidateNo} onChange={props.handleCandidateNoChange} ></input>
+                    <button className="login-button" onClick={props.voteFunction}>Vote</button>
+                </div>
+            )}
+            
 
             <table id="myTable" className="candidates-table">
                 <thead>
@@ -22,7 +27,7 @@ const Connected = (props) => {
                 </tr>
                 </thead>
                 <tbody>
-                {props.candidates && props.candidates.map((candidate, index) => (
+                {props.candidates.map((candidate, index) => (
                     <tr key={index}>
                     <td>{candidate.index}</td>
                     <td>{candidate.name}</td>

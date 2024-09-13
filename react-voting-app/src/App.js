@@ -4,6 +4,7 @@ import {contractAbi, contractAddress} from './Constant/constant.js';
 
 import Connected from "./Components/Connected.jsx"
 import Login from './Components/Login.jsx'
+import Finished from './Components/Finished.jsx'
 
 import './App.css';
 
@@ -16,6 +17,7 @@ function App() {
   const [remainingTime, setRemainingTime] = useState('');
   const [candidates, setCandidates] = useState([]);
   const [candidateNo, setCandidateNo] = useState('');
+  const [canVote, setCanVote] = useState(true);
 
 
   // this function runs whenever the app starts
@@ -40,10 +42,43 @@ function App() {
 
   });
 
+
+  async function vote() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts",[]); // get all the accounts
+
+    const signer = provider.getSigner(); // current Metamask account
+
+    const contractInstance = new ethers.Contract (
+      contractAddress, contractAbi, signer
+    );
+
+    // add logic to prevent -1 or index out of bound
+
+    const tx = await contractInstance.vote(candidateNo);
+    await tx.wait();
+    getCanVote();
+  }
+
+  // check if the current signer can vote 
+  async function getCanVote() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts",[]); // get all the accounts
+
+    const signer = provider.getSigner(); // current Metamask account
+
+    const contractInstance = new ethers.Contract (
+      contractAddress, contractAbi, signer
+    );
+
+    const voteStatus = await contractInstance.voters(await signer.getAddress());
+    setCanVote(voteStatus);
+
+  }
+
   // get candidates from contract
   async function getCandidates() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-
     await provider.send("eth_requestAccounts",[]); // get all the accounts
 
     const signer = provider.getSigner(); // current Metamask account
@@ -95,11 +130,13 @@ function App() {
     setRemainingTime(parseInt(time,16));
   }
 
+
   // when the metamask account is changed
   function handleAccountsChanged(accounts) {
 
     if (accounts.length > 0 && accounts !== accounts[0]) {
       setAccount(accounts[0]);
+      getCanVote();
     }
 
     // if the account is same or no accounts are connected
@@ -127,6 +164,7 @@ function App() {
 
         console.log("Metamask Connect: " + address);
         setIsConnected(true);
+        getCanVote();
 
       } catch (err) {
         console.error(err);
@@ -137,16 +175,27 @@ function App() {
       console.error("Metamask is not detected in the browser");
     }
   }
+  
+  async function handleCandidateNoChange(e) {
+    setCandidateNo(e.target.value);
+  }
 
+  // voting status is true means that user can vote
   return (
     <div className="App">
 
-      {isConnected? (<Connected 
+      {votingStatus? (isConnected? (<Connected 
                       account = {account}
                       candidates = {candidates}
                       remainingTime = {remainingTime}
                       candidateNo={candidateNo}
-                      />) : (<Login connectWallet = {connectToMetamask}/>)}
+                      handleCandidateNoChange = {handleCandidateNoChange}
+                      voteFunction = {vote}
+                      showButton = {canVote} />)
+
+                      :
+
+                      (<Login connectWallet = {connectToMetamask}/>)) : (<Finished />)}
       
     </div>
   );
