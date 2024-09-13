@@ -14,6 +14,8 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [votingStatus, setVotingStatus] = useState(true);
   const [remainingTime, setRemainingTime] = useState('');
+  const [candidates, setCandidates] = useState([]);
+  const [candidateNo, setCandidateNo] = useState('');
 
 
   // this function runs whenever the app starts
@@ -38,6 +40,7 @@ function App() {
 
   });
 
+  // get candidates from contract
   async function getCandidates() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
@@ -50,7 +53,16 @@ function App() {
     );
 
     const candidateList = await contractInstance.getAllVotesOfCandiates();
-    console.log(candidateList);
+    
+    const formattedCandidates = candidateList.map((candidate, index)=> {
+      return {
+        index: index,
+        name: candidate.name,
+        voteCount: candidate.voteCount.toNumber()
+      }
+    });
+    //console.log(formattedCandidates);
+    setCandidates(formattedCandidates);
 
   }
 
@@ -63,7 +75,7 @@ function App() {
       contractAddress, contractAbi, signer
     );
     const status = await contractInstance.getVotingStatus();
-    console.log(status);
+    //console.log(status);
     setVotingStatus(status);
   }
 
@@ -126,11 +138,15 @@ function App() {
     }
   }
 
-
   return (
     <div className="App">
 
-      {isConnected? (<Connected account = {account}/>) : (<Login connectWallet = {connectToMetamask}/>)}
+      {isConnected? (<Connected 
+                      account = {account}
+                      candidates = {candidates}
+                      remainingTime = {remainingTime}
+                      candidateNo={candidateNo}
+                      />) : (<Login connectWallet = {connectToMetamask}/>)}
       
     </div>
   );
