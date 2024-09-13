@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import {ethers} from 'ethers';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 import {contractAbi, contractAddress} from './Constant/constant.js';
+
 
 import Connected from "./Components/Connected.jsx"
 import Login from './Components/Login.jsx'
 import Finished from './Components/Finished.jsx'
+import RegistrationForm from './Components/RegistrationForm.jsx';
 
 import './App.css';
 
@@ -19,9 +23,12 @@ function App() {
   const [candidateNo, setCandidateNo] = useState('');
   const [canVote, setCanVote] = useState(true);
 
+  // both username and password are hashed
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
 
   // this function runs whenever the app starts
-
   useEffect( () => {
 
     getCandidates();
@@ -127,10 +134,24 @@ function App() {
     );
 
     const time = await contractInstance.getRemainingTime();
-    setRemainingTime(parseInt(time,16));
+    setRemainingTime(formatTime(parseInt(time,16)));
+
   }
 
 
+  // format time from seconds to HH:MM:SS
+  function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+  
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(secs).padStart(2, '0');
+  
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  }
+   
   // when the metamask account is changed
   function handleAccountsChanged(accounts) {
 
@@ -145,6 +166,7 @@ function App() {
       setAccount(null);
     }
   }
+
 
   async function connectToMetamask() {
 
@@ -180,7 +202,7 @@ function App() {
     setCandidateNo(e.target.value);
   }
 
-  // voting status is true means that user can vote
+  // if voting status is true, user can vote
   return (
     <div className="App">
 
@@ -193,9 +215,21 @@ function App() {
                       voteFunction = {vote}
                       showButton = {canVote} />)
 
-                      :
+                      : (
 
-                      (<Login connectWallet = {connectToMetamask}/>)) : (<Finished />)}
+                        <Router>
+                          <div>
+                            <Routes>
+                              <Route path="/" element={<Login connectToMetamask = {connectToMetamask}/>} />
+                              <Route path="/registrationForm" element={<RegistrationForm />} />   {/* Registration form page */}
+                              <Route path="/login" element={<Login connectToMetamask = {connectToMetamask}/>} />
+                            </Routes>
+                          </div>
+                        </Router>
+
+                    )) 
+
+                      : (<Finished />)}
       
     </div>
   );

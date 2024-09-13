@@ -1,0 +1,56 @@
+/* Registration form container */
+.registration-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+    box-sizing: border-box;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    background-color: #dfe9f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.registration-container h2 {
+    margin-bottom: 20px; /* Adds space below the heading */
+    text-align: center;  /* Centers the heading */
+}
+
+/* Input fields */
+input {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Submit button */
+button {
+    color:  #218838;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #218838;
+    color: white;
+}
+
+/* Error messages */
+.error {
+    color: red;
+    font-size: 12px;
+    margin: 0 0 10px 0;
+}

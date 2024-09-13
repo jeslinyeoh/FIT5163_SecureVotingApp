@@ -37,7 +37,7 @@ const Connected = (props) => {
                 </tbody>
             </table>
             
-
+            <button className="login-button" onClick={props.voteFunction}>Logout</button>
         </div>
     )
 }
