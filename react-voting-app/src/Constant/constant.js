@@ -1,4 +1,4 @@
-const contractAddress = "0x79D9CFeab4a885E7e837963e0A7B1b23A8979166";
+const contractAddress = "0x358975C8AfbB6181286b8C01F7AA18c4839a8901";
 
 const contractAbi = [
   {
@@ -18,17 +18,29 @@ const contractAbi = [
     "type": "constructor"
   },
   {
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "voter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "string",
-        "name": "_name",
+        "name": "candidateName",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
-    "name": "addCandidate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "name": "Voted",
+    "type": "event"
   },
   {
     "inputs": [
@@ -74,6 +86,19 @@ const contractAbi = [
         "internalType": "struct Voting.Candidate[]",
         "name": "",
         "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCandidatesCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

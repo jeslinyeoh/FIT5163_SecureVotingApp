@@ -38,6 +38,7 @@ const Login = (props) => {
     const { username, password } = formData;
 
     // get data from SQL
+    
     return username.trim() !== '' && password.trim() !== '';
   };
 

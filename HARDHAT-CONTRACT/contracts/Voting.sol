@@ -14,6 +14,9 @@ contract Voting {
     uint256 public votingStart;
     uint256 public votingEnd;
 
+    // Define event for audit trail
+    event Voted(address voter, string candidateName, uint256 timestamp);
+
     constructor(string[] memory _candidateNames, uint256 _durationInMinutes) {
         for (uint256 i = 0; i < _candidateNames.length; i++) {
             candidates.push(
@@ -23,15 +26,18 @@ contract Voting {
         owner = msg.sender;
         votingStart = block.timestamp;
         votingEnd = block.timestamp + (_durationInMinutes * 1 minutes);
+
+        // Emit event when voting starts
+        //emit VotingStarted(votingStart, votingEnd);
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Only the owner can perform this action.");
         _;
     }
 
-    function addCandidate(string memory _name) public onlyOwner {
-        candidates.push(Candidate({name: _name, voteCount: 0}));
+    function getCandidatesCount() public view returns (uint256) {
+        return candidates.length;
     }
 
     function vote(uint256 _candidateIndex) public {
@@ -40,8 +46,22 @@ contract Voting {
             _candidateIndex < candidates.length,
             "Invalid candidate index."
         );
+        require(
+            block.timestamp >= votingStart && block.timestamp < votingEnd,
+            "Voting is not active."
+        );
 
         candidates[_candidateIndex].voteCount++;
+
+        // Emit event when a vote is casted
+        if (!voters[msg.sender]) {
+            emit Voted(
+                msg.sender,
+                candidates[_candidateIndex].name,
+                block.timestamp
+            );
+        }
+
         voters[msg.sender] = true;
     }
 

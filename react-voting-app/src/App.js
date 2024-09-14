@@ -22,6 +22,9 @@ function App() {
   const [candidates, setCandidates] = useState([]);
   const [candidateNo, setCandidateNo] = useState('');
   const [canVote, setCanVote] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const [voteAuditTrail, setVoteAuditTrail] = useState([]);
 
   // both username and password are hashed
   const [username, setUsername] = useState('');
@@ -34,6 +37,7 @@ function App() {
     getCandidates();
     getRemainingTime();
     getCurrentStatus();
+    getAuditTrail();
 
     if(window.ethereum) {
       window.ethereum.on('accountsChanged', handleAccountsChanged);
@@ -50,6 +54,39 @@ function App() {
   });
 
 
+  async function getAuditTrail() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts",[]); // get all the accounts
+
+    const signer = provider.getSigner(); // current Metamask account
+
+    const contractInstance = new ethers.Contract (
+      contractAddress, contractAbi, signer
+    )
+
+    // get all "Voted" events
+    const filter = contractInstance.filters.Voted();
+    const events = await contractInstance.queryFilter(filter);
+
+    events.forEach(event => {
+      //console.log(`Voter: ${event.args.voter}, Candidate: ${event.args.candidateName}, Timestamp: ${event.args.timestamp}`);
+    });
+
+    const formattedEvents = events.map((event, index)=> {
+      return {
+        index: index,
+        voter: event.args.voter,
+        candidateName: event.args.candidateName,
+        timestamp: parseInt(event.args.timestamp,16)
+      }
+    });
+    
+    setVoteAuditTrail(formattedEvents);
+    setIsAdmin(true);
+    //console.log(formattedEvents);  
+  }
+
+
   async function vote() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts",[]); // get all the accounts
@@ -61,10 +98,17 @@ function App() {
     );
 
     // add logic to prevent -1 or index out of bound
+    const totalCandidates = await contractInstance.getCandidatesCount();
+    
+    if (candidateNo < 0 || candidateNo >= totalCandidates) {
+      alert("Invalid candidate number. Please select a valid candidate.");
+      return; // Exit the function if the candidateNo is invalid
+    }
 
     const tx = await contractInstance.vote(candidateNo);
     await tx.wait();
     getCanVote();
+    
   }
 
   // check if the current signer can vote 
@@ -210,10 +254,12 @@ function App() {
                       account = {account}
                       candidates = {candidates}
                       remainingTime = {remainingTime}
-                      candidateNo={candidateNo}
+                      candidateNo = {candidateNo}
+                      voteAuditTrail = {voteAuditTrail}
                       handleCandidateNoChange = {handleCandidateNoChange}
                       voteFunction = {vote}
-                      showButton = {canVote} />)
+                      showButton = {canVote} 
+                      isAdmin = {isAdmin} />)
 
                       : (
 

@@ -103,6 +103,8 @@ function RegistrationForm() {
       // Perform form submission (e.g., send data to server)
       navigate("/login");
     }
+
+    // put another function
   };
 
   return (
