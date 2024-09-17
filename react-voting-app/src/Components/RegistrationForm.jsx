@@ -107,9 +107,14 @@ function RegistrationForm() {
     // put another function
   };
 
+  // Handle registration button click
+  const handleLoginClick = () => {
+    navigate('/Login'); // Navigate to the login page
+  };
+
   return (
     <div className="registration-container">
-      <h2>Register</h2>
+      <h1>Register</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -130,7 +135,7 @@ function RegistrationForm() {
           required
         />
         {errors.lastName && <p className="error">{errors.lastName}</p>}
-
+        <p>DOB:</p>
         <input
           type="date"
           name="dob"
@@ -138,6 +143,7 @@ function RegistrationForm() {
           onChange={handleInputChange}
           required
         />
+        
         {errors.dob && <p className="error">{errors.dob}</p>}
 
         <input
@@ -222,6 +228,9 @@ function RegistrationForm() {
 
         <button type="submit">Register</button>
       </form>
+      <button type="button" onClick={handleLoginClick}>
+        Already have an account? Login
+      </button>
     </div>
   );
 }

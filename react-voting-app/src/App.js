@@ -82,7 +82,7 @@ function App() {
     });
     
     setVoteAuditTrail(formattedEvents);
-    setIsAdmin(true);
+    //setIsAdmin(true);
     //console.log(formattedEvents);  
   }
 
