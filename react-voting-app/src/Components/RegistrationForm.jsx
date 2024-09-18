@@ -1,8 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './RegistrationForm.css';
+import axios from 'axios';
+
 
 function RegistrationForm() {
+  const [values, setValues] = useState({
+    firstName: '',
+    lastName: '',
+    dob: '',
+    address: '',
+    email: '',
+    phoneNumber: '',
+    taxFileNumber: '',
+    publicKey: '',
+    username: '',
+    password: ''
+  })
+
+
   // State for form fields
   const [formData, setFormData] = useState({
     firstName: "",
@@ -97,14 +113,10 @@ function RegistrationForm() {
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (validateForm()) {
-      console.log("Form submitted successfully", formData);
-      // Perform form submission (e.g., send data to server)
-      navigate("/login");
-    }
-
-    // put another function
+    axios.post('http://localhost:8081/registrationForm',values)
+    .then(res => console.log("Registered Successfully!!"))
+    .catch(err => console.log(err));
+    navigate("/login");
   };
 
   // Handle registration button click
