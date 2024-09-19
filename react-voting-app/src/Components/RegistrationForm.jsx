@@ -5,18 +5,18 @@ import axios from 'axios';
 
 
 function RegistrationForm() {
-  const [values, setValues] = useState({
-    firstName: '',
-    lastName: '',
-    dob: '',
-    address: '',
-    email: '',
-    phoneNumber: '',
-    taxFileNumber: '',
-    publicKey: '',
-    username: '',
-    password: ''
-  })
+  // const [values, setValues] = useState({
+  //   firstName: '',
+  //   lastName: '',
+  //   dob: '',
+  //   address: '',
+  //   email: '',
+  //   phoneNumber: '',
+  //   taxFileNumber: '',
+  //   publicKey: '',
+  //   username: '',
+  //   password: ''
+  // })
 
 
   // State for form fields
@@ -28,10 +28,10 @@ function RegistrationForm() {
     email: "",
     phoneNumber: "",
     taxFileNumber: "",
+    publicKey: "", // Blockchain public key field
     username: "",  // New field for username
     password: "",
     confirmPassword: "",
-    publicKey: "", // Blockchain public key field
   });
 
   const [errors, setErrors] = useState({});
@@ -44,6 +44,8 @@ function RegistrationForm() {
       ...formData,
       [name]: value
     });
+
+    // setValues({...values, [event.target.name]:event.target.value})
   };
 
   // Helper function to validate DOB (checking if user is at least 18 years old)
@@ -113,7 +115,7 @@ function RegistrationForm() {
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:8081/registrationForm',values)
+    axios.post('http://localhost:8081/registrationForm',formData)
     .then(res => console.log("Registered Successfully!!"))
     .catch(err => console.log(err));
     navigate("/login");

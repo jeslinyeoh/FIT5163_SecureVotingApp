@@ -11,7 +11,7 @@ const db = mysql.createConnection({
     user: 'root',
     password: '',
     database: 'secure_voting'
-})
+});
 
 // Connect to MySQL
 db.connect((err) => {
@@ -24,7 +24,7 @@ db.connect((err) => {
 
 app.post('/registrationForm',(req,res)=>{
 
-    const sql = "INSERT INTO voter ('firstName', 'lastName', 'dob', 'address', 'email', 'phoneNumber', 'taxFileNumber', 'publicKey', 'username', 'password') VALUES (?)";
+    const sql = "INSERT INTO voter (firstName, lastName, dob, address, email, phoneNumber, taxFileNumber, publicKey, username, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     const values = [
         req.body.firstName,
