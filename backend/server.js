@@ -2,7 +2,7 @@ const express = require('express');
 const mysql = require('mysql')
 const cors = require('cors')
 const bcrypt = require('bcrypt');
-const salt = 10;
+const constantSalt = '$2b$10$p4bLZTdIw.5oXfLm8V1/Nu';
 
 const app = express()
 app.use(cors());
@@ -31,11 +31,11 @@ app.post('/registrationForm',(req,res)=>{
     const password = req.body.password;
     
 
-    bcrypt.hash(username.toString(), salt, (err,hashU) => {
+    bcrypt.hash(username.toString(), constantSalt, (err,hashU) => {
         if(err){
             console.log(err);   
         }
-        bcrypt.hash(password.toString(), salt, (err,hashP) =>{
+        bcrypt.hash(password.toString(), constantSalt, (err,hashP) =>{
             if(err){
                 console.log(err);   
             }
@@ -55,28 +55,53 @@ app.post('/registrationForm',(req,res)=>{
             db.query(sql, values, (err,data) =>{
                 if(err) return res.json(err);
                 return res.json(data);
-            })
-        })
-    })   
-})
+            });
+        });
+    });   
+});
 
 app.post('/login',(req,res)=>{
 
-    const sql = "SELECT * FROM voter WHERE username = ? AND password = ?";
+    const sql = "SELECT * FROM voter WHERE username = ?";
     
-    db.query(sql, [req.body.username, req.body.password], (err,data) =>{
-                if(err) {
-                    return res.json(err);
-                }
-                if(data.length > 0){
-                    return res.json("Success");
-                }
-                else{
-                    return res.json("Failed");
-                }
+    const username = req.body.username;
+    const password = req.body.password;
 
-            })
-    })
+    bcrypt.hash(username.toString(), constantSalt, (err,hashU) => {
+        if(err){
+            console.log(err);   
+        }
+
+        console.log("Hashed Username (Login):", hashU);
+
+        db.query(sql, [hashU], (err,data) =>{
+            if(err) {
+                return res.json(err);
+            }
+
+            if(data.length > 0){
+                const hashedPassword = data[0].password;
+
+                console.log("Stored Hashed Password (DB):", hashedPassword);
+                bcrypt.compare(password, hashedPassword, (err, result) =>{
+                    if (err){
+                        return res.json({error: err });
+                    }
+
+                    if(result){
+                        return res.json("Success");
+                    }
+                    else{
+                        return res.json("Incorrect Password");
+                    }
+                });
+            } else{
+                return res.json("User not found");
+            }    
+
+            });
+        });
+    });
 
 app.listen(8081,()=> {
     console.log("listening");
