@@ -5,23 +5,34 @@ import "./Login.css"
 
 const Login = (props) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:8081/login',formData)
-    .then(res => {
-      if(res.data === "Success"){
-        props.connectToMetamask();
-      } else{
-        alert("No record exists")
-      }
-    })
-    .catch(err => console.log(err));
-    
-    };
+
+    // Clear previous errors
+    setErrors({});
+
+    if (validateForm()) {
+      // Send form data to the backend for authentication
+      axios.post('http://localhost:8081/login', formData)
+        .then(res => {
+          if (res.data === "Success") {
+            console.log("Login successful, navigating to homepage");
+            props.connectToMetamask(); // Connect to MetaMask
+            navigate('/'); // Navigate to the homepage after successful login
+          } else {
+            setErrors({ general: "Invalid username or password." });
+          }
+        })
+        .catch(err => {
+          console.error("Login error:", err);
+          setErrors({ general: "An error occurred during login." });
+        });
+    }
+  };
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -34,8 +45,20 @@ const Login = (props) => {
 
   // Validate form inputs
   const validateForm = () => {
-    const { username, password } = formData;
-    return username.trim() !== '' && password.trim() !== '';
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!?_@])[A-Za-z\d!?_]{8,}$/;
+    const usernameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/; // Adjusted to allow basic special characters and be 6 characters long
+
+    let newErrors = {};
+
+    if (!usernameRegex.test(formData.username)) {
+      newErrors.username = "Invalid Username";
+    }
+    if (!passwordRegex.test(formData.password)) {
+      newErrors.password = "Invalid Password";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   // Handle registration button click
@@ -55,6 +78,8 @@ const Login = (props) => {
           onChange={handleInputChange}
           required
         />
+        {errors.username && <p style={{ color: 'red' }}>{errors.username}</p>} {/* Display username error */}
+
         <input
           type="password"
           name="password"
@@ -63,10 +88,12 @@ const Login = (props) => {
           onChange={handleInputChange}
           required
         />
+        {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>} {/* Display password error */}
+
+        {errors.general && <p style={{ color: 'red' }}>{errors.general}</p>} {/* Display general error */}
+
         <button type="submit">Login</button>
       </form>
-      
-      {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
       
       <button type="button" onClick={handleRegisterClick}>
         No Account? Register here
@@ -76,3 +103,5 @@ const Login = (props) => {
 };
 
 export default Login;
+
+
