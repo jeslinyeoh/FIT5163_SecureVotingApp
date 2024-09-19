@@ -27,32 +27,37 @@ db.connect((err) => {
 app.post('/registrationForm',(req,res)=>{
 
     const sql = "INSERT INTO voter (firstName, lastName, dob, address, email, phoneNumber, taxFileNumber, publicKey, username, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const username = req.body.username;
     const password = req.body.password;
     
 
-    bcrypt.hash(password.toString(), salt, (err,hash) => {
+    bcrypt.hash(username.toString(), salt, (err,hashU) => {
         if(err){
             console.log(err);   
         }
-        const values = [
-            req.body.firstName,
-            req.body.lastName,
-            req.body.dob,
-            req.body.address,
-            req.body.email,
-            req.body.phoneNumber,
-            req.body.taxFileNumber,
-            req.body.publicKey,
-            req.body.username,
-            hash,
-        ]
+        bcrypt.hash(password.toString(), salt, (err,hashP) =>{
+            if(err){
+                console.log(err);   
+            }
+            const values = [
+                req.body.firstName,
+                req.body.lastName,
+                req.body.dob,
+                req.body.address,
+                req.body.email,
+                req.body.phoneNumber,
+                req.body.taxFileNumber,
+                req.body.publicKey,
+                hashU,
+                hashP,
+            ]
         
-        db.query(sql, values, (err,data) =>{
-            if(err) return res.json(err);
-            return res.json(data);
+            db.query(sql, values, (err,data) =>{
+                if(err) return res.json(err);
+                return res.json(data);
+            })
         })
-    })
-    
+    })   
 })
 
 app.listen(8081,()=> {
