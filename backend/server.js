@@ -1,6 +1,8 @@
 const express = require('express');
 const mysql = require('mysql')
 const cors = require('cors')
+const bcrypt = require('bcrypt');
+const salt = 10;
 
 const app = express()
 app.use(cors());
@@ -25,24 +27,32 @@ db.connect((err) => {
 app.post('/registrationForm',(req,res)=>{
 
     const sql = "INSERT INTO voter (firstName, lastName, dob, address, email, phoneNumber, taxFileNumber, publicKey, username, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    const password = req.body.password;
     
-    const values = [
-        req.body.firstName,
-        req.body.lastName,
-        req.body.dob,
-        req.body.address,
-        req.body.email,
-        req.body.phoneNumber,
-        req.body.taxFileNumber,
-        req.body.publicKey,
-        req.body.username,
-        req.body.password,
-    ]
-    
-    db.query(sql, values, (err,data) =>{
-        if(err) return res.json(err);
-        return res.json(data);
+
+    bcrypt.hash(password.toString(), salt, (err,hash) => {
+        if(err){
+            console.log(err);   
+        }
+        const values = [
+            req.body.firstName,
+            req.body.lastName,
+            req.body.dob,
+            req.body.address,
+            req.body.email,
+            req.body.phoneNumber,
+            req.body.taxFileNumber,
+            req.body.publicKey,
+            req.body.username,
+            hash,
+        ]
+        
+        db.query(sql, values, (err,data) =>{
+            if(err) return res.json(err);
+            return res.json(data);
+        })
     })
+    
 })
 
 app.listen(8081,()=> {
