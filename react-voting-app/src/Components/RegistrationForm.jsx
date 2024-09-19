@@ -3,22 +3,7 @@ import { useNavigate } from "react-router-dom";
 import './RegistrationForm.css';
 import axios from 'axios';
 
-
 function RegistrationForm() {
-  // const [values, setValues] = useState({
-  //   firstName: '',
-  //   lastName: '',
-  //   dob: '',
-  //   address: '',
-  //   email: '',
-  //   phoneNumber: '',
-  //   taxFileNumber: '',
-  //   publicKey: '',
-  //   username: '',
-  //   password: ''
-  // })
-
-
   // State for form fields
   const [formData, setFormData] = useState({
     firstName: "",
@@ -44,8 +29,6 @@ function RegistrationForm() {
       ...formData,
       [name]: value
     });
-
-    // setValues({...values, [event.target.name]:event.target.value})
   };
 
   // Helper function to validate DOB (checking if user is at least 18 years old)
@@ -67,9 +50,12 @@ function RegistrationForm() {
   // Validation function
   const validateForm = () => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const phoneRegex = /^(\+61|0)[2-478](\d{8})$/;
-    const tfnRegex = /^\d{8,9}$/;
+    const phoneRegex = /^\+61[2-478]\d{8}$/;
+    const tfnRegex = /^\d{9}$/;
     const publicKeyRegex = /^0x[a-fA-F0-9]{40}$/; // Ethereum public key regex
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!?_@])[A-Za-z\d!?_]{8,}$/;
+    const usernameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
     let newErrors = {};
 
     if (!formData.firstName) {
@@ -95,14 +81,14 @@ function RegistrationForm() {
     if (!tfnRegex.test(formData.taxFileNumber)) {
       newErrors.taxFileNumber = "Invalid Australian Tax File Number (TFN)";
     }
-    if (!formData.username) {
-      newErrors.username = "Username is required";  // Validation for username
+    if (!usernameRegex.test(formData.username)) {
+      newErrors.username = "Username must not include any special characters and be at least 6 characters long";
     }
     if (!publicKeyRegex.test(formData.publicKey)) {
-      newErrors.publicKey = "Invalid Blockchain Public Key";
+      newErrors.publicKey = "Invalid Blockchain Public Key. Must start with 0x..";
     }
-    if (!formData.password) {
-      newErrors.password = "Password is required";
+    if (!passwordRegex.test(formData.password)) {
+      newErrors.password = "Please choose a strong password";
     }
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
@@ -115,10 +101,15 @@ function RegistrationForm() {
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:8081/registrationForm',formData)
-    .then(res => console.log("Registered Successfully!!"))
-    .catch(err => console.log(err));
-    navigate("/login");
+
+    if (validateForm()) {
+      axios.post('http://localhost:8081/registrationForm', formData)
+        .then(res => {
+          console.log("Registered Successfully!!");
+          navigate("/login");
+        })
+        .catch(err => console.log(err));
+    }
   };
 
   // Handle registration button click
@@ -149,6 +140,7 @@ function RegistrationForm() {
           required
         />
         {errors.lastName && <p className="error">{errors.lastName}</p>}
+
         <p>DOB:</p>
         <input
           type="date"
@@ -157,7 +149,6 @@ function RegistrationForm() {
           onChange={handleInputChange}
           required
         />
-        
         {errors.dob && <p className="error">{errors.dob}</p>}
 
         <input
@@ -218,7 +209,7 @@ function RegistrationForm() {
           onChange={handleInputChange}
           required
         />
-        {errors.username && <p className="error">{errors.username}</p>}  {/* Error for username */}
+        {errors.username && <p className="error">{errors.username}</p>}
 
         <input
           type="password"
