@@ -1,10 +1,9 @@
-import React from "react";
-import { useState, useEffect } from 'react';
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "./Login.css"
 
 const Login = (props) => {
-
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -12,17 +11,17 @@ const Login = (props) => {
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
+    axios.post('http://localhost:8081/login',formData)
+    .then(res => {
+      if(res.data === "Success"){
+        props.connectToMetamask();
+      } else{
+        alert("No record exists")
+      }
+    })
+    .catch(err => console.log(err));
     
-    if (validateForm()) {
-      // Clear error message if validation passes
-      setError('');
-      console.log("Navigating to homepage", formData);
-      props.connectToMetamask();
-      
-    } else {
-      setError('Username or Password is incorrect.');
-    }
-  };
+    };
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -33,12 +32,9 @@ const Login = (props) => {
     });
   };
 
-  // Validate form
+  // Validate form inputs
   const validateForm = () => {
     const { username, password } = formData;
-
-    // get data from SQL
-    
     return username.trim() !== '' && password.trim() !== '';
   };
 
@@ -77,10 +73,6 @@ const Login = (props) => {
       </button>
     </div>
   );
+};
 
-
-}
-
-
-
-export default Login
+export default Login;
