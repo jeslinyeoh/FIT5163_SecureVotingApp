@@ -92,7 +92,8 @@ const Connected = (props) => {
                     </table>
                 </div>
             )}
-    
+            <br></br>
+            <br></br>
             <button className="login-button" onClick={handleLogout}>Logout</button>
         </div>
     );
