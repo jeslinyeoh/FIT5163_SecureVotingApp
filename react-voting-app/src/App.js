@@ -23,7 +23,7 @@ function App() {
   const [candidateNo, setCandidateNo] = useState('');
   const [canVote, setCanVote] = useState(true);
   const [isAuditor, setIsAuditor] = useState(false);
-  const [isAuditor, setIsAuditor] = useState(false);
+
 
   const [voteAuditTrail, setVoteAuditTrail] = useState([]);
 
@@ -269,7 +269,6 @@ function App() {
                       handleCandidateNoChange = {handleCandidateNoChange}
                       voteFunction = {vote}
                       showButton = {canVote} 
-                      isAuditor = {isAuditor} />)
                       isAuditor = {isAuditor} />)
 
                       : (
