@@ -72,7 +72,6 @@ app.post('/login',(req,res)=>{
     
     const username = req.body.username;
     const password = req.body.password;
-    //const isAuditor = req.body.isAuditor;
 
     bcrypt.hash(username.toString(), constantSalt, (err,hashU) => {
         if(err){
@@ -89,8 +88,8 @@ app.post('/login',(req,res)=>{
             if(data.length > 0){
                 const hashedPassword = data[0].password;
                 const isAuditor = data[0].isAuditor;
+                const publicKey = data[0].publicKey;
 
-                //console.log("Role is",role);
 
                 console.log("Stored Hashed Password (DB):", hashedPassword);
                 bcrypt.compare(password, hashedPassword, (err, result) =>{
@@ -99,9 +98,14 @@ app.post('/login',(req,res)=>{
                     }
 
                     if(result){
-                        return res.json(isAuditor);
-                        //return res.json();
+                        return res.json({
+                            success: true,
+                            isAuditor: isAuditor,
+                            publicKey: publicKey
+                        });
+    
                     }
+
                     else{
                         return res.json("Incorrect Password");
                     }
@@ -117,3 +121,6 @@ app.post('/login',(req,res)=>{
 app.listen(8081,()=> {
     console.log("listening");
 })
+
+
+

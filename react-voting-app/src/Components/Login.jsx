@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./Login.css"
@@ -7,8 +7,8 @@ const Login = (props) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errors, setErrors] = useState({});
  
-  const message = "";
   const navigate = useNavigate();
+
 
   // Handle form submission
   const handleSubmit = (event) => {
@@ -21,23 +21,24 @@ const Login = (props) => {
       // Send form data to the backend for authentication
       axios.post('http://localhost:8081/login', formData)
         .then(res => {
-          //message, isAuditor = res.data;
-          console.log(res.data);
-          if (res.data === 0 || res.data === 1) {
+
+          if (res.data.success) {
             console.log("Login successful, navigating to homepage");
-            if (res.data === 1) {
+            
+            if (res.data.isAuditor === 1) {
               props.setIsAuditor(true);
             }
-           
-          
 
-            props.connectToMetamask(); // Connect to MetaMask
-            
-          }else    
+            console.log("login public key" + res.data.publicKey);
+            props.setPublicKey(res.data.publicKey);
+          }
+
+          else    
           {
             setErrors({ general: "Invalid username or password." });
           }
         })
+
         .catch(err => {
           console.error("Login error:", err);
           setErrors({ general: "An error occurred during login." });

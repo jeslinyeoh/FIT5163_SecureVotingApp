@@ -18,7 +18,7 @@ const Connected = (props) => {
             <p className="connected-account">Metamask Account: {props.account}</p>
             <p className="connected-account">Remaining Time: {props.remainingTime}</p>
     
-            {props.isAuditor ? ( // if user is admin
+            {props.isAuditor ? ( // if user is auditor
                 <div>
                     <table id="myTable" className="candidates-table">
                         <thead>
@@ -41,7 +41,7 @@ const Connected = (props) => {
                         </tbody>
                     </table>
                 </div> 
-            ) : props.showButton ? ( // if user is not admin && already voted
+            ) : props.showButton ? ( // if user is not auditor && already voted
                 <div>
                     <p className="connected-header">You have already voted</p>
                     <table id="myTable" className="candidates-table">

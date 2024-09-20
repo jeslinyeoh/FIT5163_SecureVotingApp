@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {ethers} from 'ethers';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -26,10 +26,19 @@ function App() {
 
   const [voteAuditTrail, setVoteAuditTrail] = useState([]);
 
-  // both username and password are hashed
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [publicKey, setPublicKey] = useState('');
+  const callConnect = useRef(true);
 
+  useEffect(() => {
+    console.log("checking");
+    // ensure that the public key is updated before displaying voting page
+    if (publicKey !== '' && callConnect.current === true) { 
+      // Trigger MetaMask connection once publicKey state is updated
+      callConnect.current = false; 
+      console.log("public key state changed " + publicKey);
+      connectToMetamask();
+    }
+  }, [publicKey]);
 
   // this function runs whenever the app starts
   useEffect( () => {
@@ -43,6 +52,7 @@ function App() {
       window.ethereum.on('accountsChanged', handleAccountsChanged);
 
     }
+
 
     return() => {
 
@@ -68,9 +78,9 @@ function App() {
     const filter = contractInstance.filters.Voted();
     const events = await contractInstance.queryFilter(filter);
 
-    events.forEach(event => {
-      //console.log(`Voter: ${event.args.voter}, Candidate: ${event.args.candidateName}, Timestamp: ${event.args.timestamp}`);
-    });
+    // events.forEach(event => {
+    //   //console.log(`Voter: ${event.args.voter}, Candidate: ${event.args.candidateName}, Timestamp: ${event.args.timestamp}`);
+    // });
 
     const formattedEvents = events.map((event, index)=> {
       return {
@@ -199,22 +209,12 @@ function App() {
   // when the metamask account is changed
   function handleAccountsChanged(accounts) {
 
-    if (accounts.length > 0 && accounts !== accounts[0]) {
-      setAccount(accounts[0]);
-      getCanVote();
-    }
-
-    // if the account is same or no accounts are connected
-    else {
-      setIsConnected(false);
-      setAccount(null);
-    }
+    alert("Current Metamask account has changed, please log in again using the correct Metamask account.");
+    window.location.reload();
   }
 
 
   async function connectToMetamask() {
-
-    // add function to check username and account
 
     if(window.ethereum) {
   
@@ -226,11 +226,19 @@ function App() {
         const signer = provider.getSigner(); // current Metamask account
         const address = await signer.getAddress();
 
+        if (publicKey !== address) {
+          console.log("Logged in to this address: " + address);
+          console.log("public key retrieved is: " + publicKey);
+          alert("Current Metamask account is not registered, please log in using the correct Metamask account.");
+          window.location.reload();
+        }
+
         setAccount(address);
 
         console.log("Metamask Connect: " + address);
         setIsConnected(true);
         getCanVote();
+
 
       } catch (err) {
         console.error(err);
@@ -246,7 +254,7 @@ function App() {
     setCandidateNo(e.target.value);
   }
 
-  // if voting status is true, user can vote
+  // if voting status is true, users can vote
   return (
     <div className="App">
 
@@ -266,9 +274,9 @@ function App() {
                         <Router>
                           <div>
                             <Routes>
-                              <Route path="/" element={<Login connectToMetamask = {connectToMetamask} setIsAuditor={setIsAuditor}/>}/>
+                              <Route path="/" element={<Login connectToMetamask = {connectToMetamask} setIsAuditor={setIsAuditor} setPublicKey={setPublicKey} />} />
                               <Route path="/registrationForm" element={<RegistrationForm />} />   {/* Registration form page */}
-                              <Route path="/login" element={<Login connectToMetamask = {connectToMetamask} setIsAuditor={setIsAuditor}/>} />
+                              <Route path="/login" element={<Login connectToMetamask = {connectToMetamask} setIsAuditor={setIsAuditor} setPublicKey={setPublicKey}/>} />
                             </Routes>
                           </div>
                         </Router>
