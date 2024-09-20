@@ -23,6 +23,7 @@ function App() {
   const [candidateNo, setCandidateNo] = useState('');
   const [canVote, setCanVote] = useState(true);
   const [isAuditor, setIsAuditor] = useState(false);
+  const [isAuditor, setIsAuditor] = useState(false);
 
   const [voteAuditTrail, setVoteAuditTrail] = useState([]);
 
@@ -92,6 +93,7 @@ function App() {
     });
     
     setVoteAuditTrail(formattedEvents);
+    //setIsAuditor(true);
     //setIsAuditor(true);
     //console.log(formattedEvents);  
   }
@@ -267,6 +269,7 @@ function App() {
                       handleCandidateNoChange = {handleCandidateNoChange}
                       voteFunction = {vote}
                       showButton = {canVote} 
+                      isAuditor = {isAuditor} />)
                       isAuditor = {isAuditor} />)
 
                       : (
