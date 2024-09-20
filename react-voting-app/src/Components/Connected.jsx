@@ -18,7 +18,7 @@ const Connected = (props) => {
             <p className="connected-account">Metamask Account: {props.account}</p>
             <p className="connected-account">Remaining Time: {props.remainingTime}</p>
     
-            {props.isAdmin ? ( // if user is admin
+            {props.isAuditor ? ( // if user is admin
                 <div>
                     <table id="myTable" className="candidates-table">
                         <thead>

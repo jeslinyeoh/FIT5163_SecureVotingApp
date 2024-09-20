@@ -22,7 +22,7 @@ function App() {
   const [candidates, setCandidates] = useState([]);
   const [candidateNo, setCandidateNo] = useState('');
   const [canVote, setCanVote] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuditor, setIsAuditor] = useState(false);
 
   const [voteAuditTrail, setVoteAuditTrail] = useState([]);
 
@@ -82,7 +82,7 @@ function App() {
     });
     
     setVoteAuditTrail(formattedEvents);
-    //setIsAdmin(true);
+    //setIsAuditor(true);
     //console.log(formattedEvents);  
   }
 
@@ -259,16 +259,16 @@ function App() {
                       handleCandidateNoChange = {handleCandidateNoChange}
                       voteFunction = {vote}
                       showButton = {canVote} 
-                      isAdmin = {isAdmin} />)
+                      isAuditor = {isAuditor} />)
 
                       : (
 
                         <Router>
                           <div>
                             <Routes>
-                              <Route path="/" element={<Login connectToMetamask = {connectToMetamask}/>} />
+                              <Route path="/" element={<Login connectToMetamask = {connectToMetamask} setIsAuditor={setIsAuditor}/>}/>
                               <Route path="/registrationForm" element={<RegistrationForm />} />   {/* Registration form page */}
-                              <Route path="/login" element={<Login connectToMetamask = {connectToMetamask}/>} />
+                              <Route path="/login" element={<Login connectToMetamask = {connectToMetamask} setIsAuditor={setIsAuditor}/>} />
                             </Routes>
                           </div>
                         </Router>
