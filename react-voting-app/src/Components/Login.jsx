@@ -6,6 +6,8 @@ import "./Login.css"
 const Login = (props) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [errors, setErrors] = useState({});
+ 
+  const message = "";
   const navigate = useNavigate();
 
   // Handle form submission
@@ -19,11 +21,20 @@ const Login = (props) => {
       // Send form data to the backend for authentication
       axios.post('http://localhost:8081/login', formData)
         .then(res => {
-          if (res.data === "Success") {
+          //message, isAuditor = res.data;
+          console.log(res.data);
+          if (res.data === 0 || res.data === 1) {
             console.log("Login successful, navigating to homepage");
+            if (res.data === 1) {
+              props.setIsAuditor(true);
+            }
+           
+          
+
             props.connectToMetamask(); // Connect to MetaMask
-            //navigate('/'); // Navigate to the homepage after successful login
-          } else {
+            
+          }else    
+          {
             setErrors({ general: "Invalid username or password." });
           }
         })
