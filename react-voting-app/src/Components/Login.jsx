@@ -22,7 +22,7 @@ const Login = (props) => {
           if (res.data === "Success") {
             console.log("Login successful, navigating to homepage");
             props.connectToMetamask(); // Connect to MetaMask
-            navigate('/'); // Navigate to the homepage after successful login
+            //navigate('/'); // Navigate to the homepage after successful login
           } else {
             setErrors({ general: "Invalid username or password." });
           }

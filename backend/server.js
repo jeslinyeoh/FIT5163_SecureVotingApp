@@ -29,6 +29,7 @@ app.post('/registrationForm',(req,res)=>{
     const sql = "INSERT INTO voter (firstName, lastName, dob, address, email, phoneNumber, taxFileNumber, publicKey, username, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const username = req.body.username;
     const password = req.body.password;
+    const taxFileNumber = req.body.taxFileNumber;
     
 
     bcrypt.hash(username.toString(), constantSalt, (err,hashU) => {
@@ -39,22 +40,27 @@ app.post('/registrationForm',(req,res)=>{
             if(err){
                 console.log(err);   
             }
-            const values = [
-                req.body.firstName,
-                req.body.lastName,
-                req.body.dob,
-                req.body.address,
-                req.body.email,
-                req.body.phoneNumber,
-                req.body.taxFileNumber,
-                req.body.publicKey,
-                hashU,
-                hashP,
-            ]
+            bcrypt.hash(taxFileNumber.toString(), constantSalt, (err,hashT) =>{
+                if(err){
+                    console.log(err);   
+                }
+                const values = [
+                    req.body.firstName,
+                    req.body.lastName,
+                    req.body.dob,
+                    req.body.address,
+                    req.body.email,
+                    req.body.phoneNumber,
+                    hashT,
+                    req.body.publicKey,
+                    hashU,
+                    hashP,
+                ]
         
-            db.query(sql, values, (err,data) =>{
-                if(err) return res.json(err);
-                return res.json(data);
+                db.query(sql, values, (err,data) =>{
+                    if(err) return res.json(err);
+                    return res.json(data);
+                });
             });
         });
     });   
